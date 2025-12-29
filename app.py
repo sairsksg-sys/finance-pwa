@@ -234,10 +234,20 @@ if __name__=="__main__":
           port=int(os.environ.get("PORT", 8080))
      )
 
-"scripts": {
-  "start": "node server.js"
-}
+@app.route("/")
+def home():
+    return "✅ fipet-app is running successfully on Railway!"
 
-app.get("/", (req, res) => {
-  res.send("fipet-app is running 🐾");
-});
+@app.route("/health")
+def health():
+    return jsonify(status="ok")
+
+# ---------- MAIN ----------
+
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 8080))  # Railway injects PORT
+    app.run(
+        host="0.0.0.0",  # REQUIRED for Railway
+        port=port,
+        debug=False      # Must be False in production
+    )
