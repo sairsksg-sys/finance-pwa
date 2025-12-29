@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="manifest" href="/static/manifest.json">
+
+<script>
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("/static/sw.js");
+}
+</script>
+
+#<link rel="stylesheet" href="/static/styles.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="manifest" href="/static/manifest.json">
+<script>if("serviceWorker" in navigator){navigator.serviceWorker.register("/static/sw.js");}</script>
+</head>
+<body>
+<h2 style="text-align:center;">Finance Planner</h2>
+<div class="dashboard">
+<div class="card" onclick="location.href='/expenses'"><i class="fa fa-wallet"></i><p>Expenses</p></div>
+<div class="card" onclick="location.href='/investments'"><i class="fa fa-chart-line"></i><p>Investments</p></div>
+<div class="card" onclick="location.href='/payments'"><i class="fa fa-calendar-check"></i><p>Payment Scheduler</p></div>
+<div class="card" onclick="location.href='/reports'"><i class="fa fa-file"></i><p>Reports</p></div>
+</div>
+</body>
+</html>

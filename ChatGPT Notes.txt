@@ -1,0 +1,51 @@
+FIPET ChatGPT Notes
+===================
+
+requested so far, including:
+
+Multi-country finance tracker (INR/SGD)
+
+Expenses, Investments, Payment Scheduler
+
+Auto-currency population
+
+Vertical form layout
+
+Dashboard with icons
+
+Investment maturity calculation (compound interest)
+
+Charts (Chart.js)
+
+CSV / Excel / PDF export
+
+Login security (Flask-Login)
+
+PWA offline mode
+
+Email reminders (scheduled)
+
+This will be copy-paste-ready so you can create your ZIP folder yourself. I’ll structure the files as a proper Flask project.
+
+---------------------------------
+Project Structure
+finance_tracker/
+│
+├── app.py
+├── init_db.py
+├── finance.db        (auto-created)
+│
+├── templates/
+│   ├── home.html
+│   ├── login.html
+│   ├── expenses.html
+│   ├── investments.html
+│   ├── payments.html
+│   └── reports.html
+│
+└── static/
+    ├── styles.css
+    ├── manifest.json
+    └── sw.js
+-----------------------------------
+https://chatgpt.com/c/694f5e21-6734-8324-a9e2-64252cb7016c

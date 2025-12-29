@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="manifest" href="/static/manifest.json">
+
+<script>
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("/static/sw.js");
+}
+</script>
+
+#<link rel="stylesheet" href="/static/styles.css">
+<title>Add Expense</title>
+<script>
+function setCurrency(){
+  const c = document.getElementById("country").value;
+  document.getElementById("currency").value = c==="SG"?"SGD":"INR";
+}
+function toggleOther(){
+  document.getElementById("mode_other").style.display =
+    document.getElementById("mode").value==="Others"?"block":"none";
+}
+</script>
+</head>
+<body>
+
+<div class="navbar">
+  <a href="/" class="nav-home">🏠 Home</a>
+</div>
+
+<div class="form-container">
+<h2>Add Expense</h2>
+
+<form method="POST">
+
+<div class="form-group">
+<label>Expense Title</label>
+<input name="title" required>
+</div>
+
+<div class="form-group">
+<label>Description / Notes</label>
+<textarea name="description"></textarea>
+</div>
+
+<div class="form-group">
+<label>Expense Date</label>
+<input type="date" name="date" required>
+</div>
+
+<div class="form-group">
+<label>Country</label>
+<select name="country" id="country" onchange="setCurrency()" required>
+<option value="">Select</option>
+<option value="SG">Singapore</option>
+<option value="IND">India</option>
+</select>
+</div>
+
+<div class="form-group">
+<label>Currency</label>
+<input name="currency" id="currency" readonly>
+</div>
+
+<div class="form-group">
+<label>Expense Mode</label>
+<select name="mode" id="mode" onchange="toggleOther()" required>
+<option>Cash</option>
+<option>Card</option>
+<option>GPay</option>
+<option>Paynow</option>
+<option>Others</option>
+</select>
+</div>
+
+<div class="form-group" id="mode_other" style="display:none;">
+<label>Specify Other Mode</label>
+<input name="mode_other">
+</div>
+
+<div class="form-group">
+<label>Amount</label>
+<input type="number" step="0.01" name="amount" required>
+</div>
+
+<button>Add Expense</button>
+</form>
+
+<h3>Saved Expenses</h3>
+
+<table>
+<tr>
+  <th>Date</th><th>Title</th><th>Country</th>
+  <th>Mode</th><th>Amount</th>
+</tr>
+
+{% for e in expenses %}
+<tr>
+  <td>{{ e.date }}</td>
+  <td>{{ e.title }}</td>
+  <td>{{ e.country }}</td>
+  <td>{{ e.mode }}</td>
+  <td>{{ e.currency }} {{ e.amount }}</td>
+</tr>
+{% endfor %}
+</table>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,21 @@
+body {font-family:Arial;background:#f5f7fb;}
+.form-container{max-width:500px;margin:30px auto;background:white;padding:25px;border-radius:15px;box-shadow:0 8px 20px rgba(0,0,0,0.1);}
+.form-group{display:flex;flex-direction:column;margin-bottom:15px;}
+label{font-weight:bold;margin-bottom:5px;}
+input,select,textarea{padding:10px;border-radius:8px;border:1px solid #ccc;}
+button{margin-top:10px;padding:12px;background:#007bff;border:none;color:white;border-radius:10px;cursor:pointer;}
+.dashboard{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:20px;padding:30px;}
+.card{background:white;padding:25px;border-radius:15px;text-align:center;box-shadow:0 6px 15px rgba(0,0,0,.1);cursor:pointer;}
+.card i{font-size:36px;color:#007bff;}
+.card:hover{transform:scale(1.05);}
+.navbar {
+  background: #007bff;
+  padding: 12px;
+}
+
+.navbar a {
+  color: white;
+  text-decoration: none;
+  font-size: 18px;
+  font-weight: bold;
+}
