@@ -229,25 +229,36 @@ scheduler.start()
 
 if __name__=="__main__":
 #    app.run()
-     app.run(
-          host="0.0.0.0",
-          port=int(os.environ.get("PORT", 8080))
-     )
+#############
+#     app.run(
+#          host="0.0.0.0",
+#          port=int(os.environ.get("PORT", 8080))
+#     )
+#
+#@app.route("/")
+#def home():
+#    return "✅ fipet-app is running successfully on Railway!"
+#
+#@app.route("/health")
+#def health():
+#    return jsonify(status="ok")
+#
+## ---------- MAIN ----------
+#
+#if __name__ == "__main__":
+#    port = int(os.environ.get("PORT", 8080))  # Railway injects PORT
+#    app.run(
+#        host="0.0.0.0",  # REQUIRED for Railway
+#        port=port,
+#        debug=False      # Must be False in production
+#    )
+###########
+
+from flask import Flask
+
+app = Flask(__name__)
 
 @app.route("/")
 def home():
-    return "✅ fipet-app is running successfully on Railway!"
+    return "✅ fipet-app is LIVE on Railway"
 
-@app.route("/health")
-def health():
-    return jsonify(status="ok")
-
-# ---------- MAIN ----------
-
-if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 8080))  # Railway injects PORT
-    app.run(
-        host="0.0.0.0",  # REQUIRED for Railway
-        port=port,
-        debug=False      # Must be False in production
-    )
