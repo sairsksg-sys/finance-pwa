@@ -1,28 +1,103 @@
 <!DOCTYPE html>
 <html>
 <head>
-<link rel="manifest" href="/static/manifest.json">
+  <meta charset="utf-8">
+  <title>Payment Scheduler</title>
 
-<script>
-if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.register("/static/sw.js");
-}
-</script>
+  <link rel="manifest" href="/static/manifest.json">
 
-#<link rel="stylesheet" href="/static/styles.css">
-<title>Payment Scheduler</title>
+  <script>
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("/static/sw.js");
+    }
 
-<script>
-function setCurrency(){
-  const c=document.getElementById("country").value;
-  document.getElementById("currency").value=c==="SG"?"SGD":"INR";
-}
-function toggleOther(){
-  document.getElementById("mode_other").style.display =
-    document.getElementById("mode").value==="Others"?"block":"none";
-}
-</script>
+    function setCurrency() {
+      const c = document.getElementById("country").value;
+      document.getElementById("currency").value = c === "SG" ? "SGD" : "INR";
+    }
+
+    function toggleOther() {
+      document.getElementById("mode_other").style.display =
+        document.getElementById("mode").value === "Others" ? "block" : "none";
+    }
+  </script>
+
+  <style>
+    body { font-family: Arial, sans-serif; background: #f6f7fb; }
+
+    .navbar {
+      background: #222;
+      padding: 10px;
+    }
+
+    .nav-home {
+      color: #fff;
+      text-decoration: none;
+      font-size: 18px;
+    }
+
+    .form-container {
+      background: #fff;
+      max-width: 750px;
+      margin: 20px auto;
+      padding: 20px;
+      border-radius: 8px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 12px;
+    }
+
+    label { font-weight: bold; margin-bottom: 4px; }
+
+    input, select, textarea {
+      padding: 8px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      margin-top: 10px;
+      padding: 10px;
+      background: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      background: #fff;
+    }
+
+    th, td {
+      padding: 8px;
+      border: 1px solid #ccc;
+      text-align: center;
+    }
+
+    th { background: #eee; }
+
+    .actions a {
+      margin: 0 5px;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .edit { color: #1976d2; }
+    .delete { color: #d32f2f; }
+
+    .status-overdue { color: red; font-weight: bold; }
+    .status-upcoming { color: orange; font-weight: bold; }
+    .status-paid { color: green; font-weight: bold; }
+  </style>
 </head>
+
 <body>
 
 <div class="navbar">
@@ -30,108 +105,143 @@ function toggleOther(){
 </div>
 
 <div class="form-container">
-<h2>Payment Scheduler</h2>
 
-<form method="POST">
+  <h2>{{ 'Edit Payment' if edit_payment else 'Add Payment' }}</h2>
 
-<div class="form-group">
-<label>Payment Title</label>
-<input name="title" required>
+  <form method="POST"
+        action="{{ url_for('update_payment', id=edit_payment.id) if edit_payment else url_for('add_payment') }}">
+
+    <div class="form-group">
+      <label>Payment Title</label>
+      <input name="title" required value="{{ edit_payment.title if edit_payment }}">
+    </div>
+
+    <div class="form-group">
+      <label>Description</label>
+      <textarea name="description">{{ edit_payment.description if edit_payment }}</textarea>
+    </div>
+
+    <div class="form-group">
+      <label>Country</label>
+      <select name="country" id="country" onchange="setCurrency()" required>
+        <option value="">Select</option>
+        <option value="SG" {{ 'selected' if edit_payment and edit_payment.country=='SG' }}>Singapore</option>
+        <option value="IND" {{ 'selected' if edit_payment and edit_payment.country=='IND' }}>India</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label>Currency</label>
+      <input name="currency" id="currency" readonly
+             value="{{ edit_payment.currency if edit_payment }}">
+    </div>
+
+    <div class="form-group">
+      <label>Repeat Interval</label>
+      <select name="interval">
+        {% for opt in ['Daily','Monthly','Quarterly','Half Yearly','Annual'] %}
+        <option value="{{ opt }}"
+          {{ 'selected' if edit_payment and edit_payment.interval==opt }}>
+          {{ opt }}
+        </option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label>Due Date</label>
+      <input type="date" name="due_date" required
+             value="{{ edit_payment.due_date if edit_payment }}">
+    </div>
+
+    <div class="form-group">
+      <label>Payment Mode</label>
+      <select name="mode" id="mode" onchange="toggleOther()">
+        {% for opt in ['Cash','Card','GPay','Paynow','Others'] %}
+        <option value="{{ opt }}"
+          {{ 'selected' if edit_payment and edit_payment.mode==opt }}>
+          {{ opt }}
+        </option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="form-group" id="mode_other"
+         style="display: {{ 'block' if edit_payment and edit_payment.mode=='Others' else 'none' }};">
+      <label>Specify Other Mode</label>
+      <input name="mode_other" value="{{ edit_payment.mode_other if edit_payment }}">
+    </div>
+
+    <div class="form-group">
+      <label>Reminder</label>
+      <div style="display:flex; gap:10px;">
+        <input type="number" name="reminder_value"
+               value="{{ edit_payment.reminder_value if edit_payment }}">
+        <select name="reminder_unit">
+          <option {{ 'selected' if edit_payment and edit_payment.reminder_unit=='Days' }}>Days</option>
+          <option {{ 'selected' if edit_payment and edit_payment.reminder_unit=='Hours' }}>Hours</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Email for Reminder</label>
+      <input type="email" name="email"
+             value="{{ edit_payment.email if edit_payment }}">
+    </div>
+
+    <div class="form-group">
+      <label>Status</label>
+      <select name="status">
+        {% for opt in ['Upcoming','Paid'] %}
+        <option value="{{ opt }}"
+          {{ 'selected' if edit_payment and edit_payment.status==opt }}>
+          {{ opt }}
+        </option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <button type="submit">
+      {{ 'Update Payment' if edit_payment else 'Add Payment' }}
+    </button>
+  </form>
+
+  <h3>Scheduled Payments</h3>
+
+  <table>
+    <tr>
+      <th>Title</th>
+      <th>Due Date</th>
+      <th>Country</th>
+      <th>Status</th>
+      <th>Actions</th>
+    </tr>
+
+    {% for p in payments %}
+    <tr>
+      <td>{{ p.title }}</td>
+      <td>{{ p.due_date }}</td>
+      <td>{{ p.country }}</td>
+      <td>
+        {% if p.status == 'Paid' %}
+          <span class="status-paid">Paid</span>
+        {% elif p.due_date < today %}
+          <span class="status-overdue">Overdue</span>
+        {% else %}
+          <span class="status-upcoming">Upcoming</span>
+        {% endif %}
+      </td>
+      <td class="actions">
+        <a class="edit" href="{{ url_for('edit_payment', id=p.id) }}">✏️</a>
+        <a class="delete" href="{{ url_for('delete_payment', id=p.id) }}"
+           onclick="return confirm('Delete this payment?')">🗑️</a>
+      </td>
+    </tr>
+    {% endfor %}
+  </table>
+
 </div>
-
-<div class="form-group">
-<label>Description</label>
-<textarea name="description"></textarea>
-</div>
-
-<div class="form-group">
-<label>Country</label>
-<select name="country" id="country" onchange="setCurrency()" required>
-<option value="">Select</option>
-<option value="SG">Singapore</option>
-<option value="IND">India</option>
-</select>
-</div>
-
-<div class="form-group">
-<label>Currency</label>
-<input name="currency" id="currency" readonly>
-</div>
-
-<div class="form-group">
-<label>Repeat Interval</label>
-<select name="interval">
-<option>Daily</option>
-<option>Monthly</option>
-<option>Quarterly</option>
-<option>Half Yearly</option>
-<option>Annual</option>
-</select>
-</div>
-
-<div class="form-group">
-<label>Due Date</label>
-<input type="date" name="due_date" required>
-</div>
-
-<div class="form-group">
-<label>Payment Mode</label>
-<select name="mode" id="mode" onchange="toggleOther()">
-<option>Cash</option>
-<option>Card</option>
-<option>GPay</option>
-<option>Paynow</option>
-<option>Others</option>
-</select>
-</div>
-
-<div class="form-group" id="mode_other" style="display:none;">
-<label>Specify Other Mode</label>
-<input name="mode_other">
-</div>
-
-<div class="form-group">
-<label>Reminder</label>
-<input type="number" name="reminder_value" placeholder="Number">
-<select name="reminder_unit">
-<option>Days</option>
-<option>Hours</option>
-</select>
-</div>
-
-<div class="form-group">
-<label>Email for Reminder</label>
-<input type="email" name="email">
-</div>
-
-<button>Add Payment</button>
-</form>
-</div>
-
-<h3>Scheduled Payments</h3>
-
-<table>
-<tr>
-  <th>Title</th><th>Due Date</th>
-  <th>Country</th><th>Status</th>
-</tr>
-
-{% for p in payments %}
-<tr>
-  <td>{{ p.title }}</td>
-  <td>{{ p.due_date }}</td>
-  <td>{{ p.country }}</td>
-  <td>
-    {% if p.due_date < today %}
-      <span style="color:red">Overdue</span>
-    {% else %}
-      Upcoming
-    {% endif %}
-  </td>
-</tr>
-{% endfor %}
-</table>
-
 
 </body>
 </html>

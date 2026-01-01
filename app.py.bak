@@ -79,22 +79,26 @@ def home():
 # ==========================================================
 # EXPENSES CRUD
 # ==========================================================
-@app.route("/expenses", methods=["GET","POST"])
+@app.route("/expenses", methods=["GET", "POST"])
 def expenses():
     con = db()
-    if request.method=="POST":
-        con.execute("""INSERT INTO expenses
-        (category, title, description, date, country, currency, mode, mode_other, amount)
-        VALUES (?,?,?,?,?,?,?,?,?)""",
-        (request.form["category"], request.form["title"], request.form["description"],
-         request.form["date"], request.form["country"],
-         request.form["currency"], request.form["mode"],
-         request.form.get("mode_other"), request.form["amount"]))
-        con.commit()
 
-    rows = con.execute("SELECT * FROM expenses ORDER BY date DESC").fetchall()
-    return render_template("expenses.html", expenses=rows)
-    return redirect("/expenses")
+    if request.method == "POST":
+        con.execute("""
+            INSERT INTO expenses
+            (title, description, date, country, currency, mode, amount)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+        """, (
+            request.form["title"],
+            request.form["description"],
+            request.form["date"],
+            request.form["country"],
+            request.form["currency"],
+            request.form["mode"],
+            request.form["amount"]
+        ))
+        con.commit()
+        return redirect("/expenses")
 
     rows = con.execute("SELECT * FROM expenses ORDER BY date DESC").fetchall()
     return render_template("expenses.html", expenses=rows)

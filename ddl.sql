@@ -1,19 +1,5 @@
-import sqlite3
-db = sqlite3.connect("finance.db")
-c = db.cursor()
-
-# Users
-c.execute("""
-CREATE TABLE IF NOT EXISTS users (
-id INTEGER PRIMARY KEY,
-email TEXT UNIQUE,
-password TEXT
-)
-""")
-
-# Payments
-c.execute("""
-CREATE TABLE IF NOT EXISTS payments (
+-- Payments
+CREATE TABLE payments (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   title TEXT,
   description TEXT,
@@ -27,84 +13,64 @@ CREATE TABLE IF NOT EXISTS payments (
   reminder_unit TEXT,
   email TEXT,
   status TEXT
-)
-""")
+);
 
-# Expenses
+-- Expenses
 
-c.execute("""
 CREATE TABLE IF NOT EXISTS expenses (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    category TEXT NOT NULL,
+
     title TEXT NOT NULL,
     description TEXT,
+
     date TEXT NOT NULL,               -- YYYY-MM-DD
     country TEXT NOT NULL,            -- SG / IND
     currency TEXT NOT NULL,           -- SGD / INR
+
     mode TEXT NOT NULL,               -- Cash, Card, GPay, Paynow, Others
     mode_other TEXT,                  -- if mode = Others
+
     amount REAL NOT NULL,
+
     created_at TEXT DEFAULT CURRENT_TIMESTAMP
-)
-""")
+);
 
 
-# Investments
+-- Investments
 
-c.execute("""
 CREATE TABLE IF NOT EXISTS investments (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
+
     instrument TEXT NOT NULL,          -- Bonds, Equities, FD, etc.
     instrument_other TEXT,
+
     title TEXT NOT NULL,
     description TEXT,
+
     country TEXT NOT NULL,             -- SG / IND
     currency TEXT NOT NULL,            -- SGD / INR
+
     invest_date TEXT NOT NULL,         -- YYYY-MM-DD
     maturity_date TEXT,                -- optional
+
     principal REAL NOT NULL,
     interest REAL,                     -- %
     maturity_value REAL,               -- auto calculated
+
     created_at TEXT DEFAULT CURRENT_TIMESTAMP
-)
-""")
+);
 
-# Indexes
+-- Indexes
 
-c.execute("""
 CREATE INDEX IF NOT EXISTS idx_expenses_date
-ON expenses(date)
-""")
+ON expenses(date);
 
-c.execute("""
 CREATE INDEX IF NOT EXISTS idx_expenses_country
-ON expenses(country)
-""")
+ON expenses(country);
 
-c.execute("""
 CREATE INDEX IF NOT EXISTS idx_investments_date
-ON investments(invest_date)
-""")
+ON investments(invest_date);
 
-c.execute("""
 CREATE INDEX IF NOT EXISTS idx_investments_country
-ON investments(country)
-""")
+ON investments(country);
 
-# Users
-#c.execute("""
-#insert into users (id, email, password) values (1,'sairsk.sg@gmail.com','N1k3andRR33b0k')
-#""")
-#c.execute("""
-#insert into users (id, email, password) values (2,'sai.rathi80@gmail.com','N1k3andRR33b0k')
-#""")
-#c.execute("""
-#insert into users (id, email, password) values (3,'rithanyars20@gmail.com','N1k3andRR33b0k')
-#""")
-#c.execute("""
-#insert into users (id, email, password) values (4,'raswanthi.2005@gmail.com','N1k3andRR33b0k')
-#""")
-#
-db.commit()
-db.close()
-print("Database initialized successfully")
